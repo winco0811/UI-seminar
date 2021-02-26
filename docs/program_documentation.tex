@@ -1,0 +1,19 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[]{hyperref}
+\author{Vinko Lovrenčić \\ \footnotesize Mentor: prof. dr. sc. Luka Grubišić \\ Prirodoslovno-matematički fakultet, Matematički odsjek}
+\date{February 25th 2021.}
+\title{Program documentation for using Hill climbing algorithms to solve N-queen problem}
+\begin{document}
+	\begin{titlepage}
+                \maketitle
+        \end{titlepage}
+	\tableofcontents
+	\section{General information, common code}
+		\subsection{General information}
+			Here we are going to explain the code used in this project and it's uses, we are gonna explain classes, variables, methods etc. We are not gonna analyze said code/algorithms or compare them, this is something we will be saving for User documentation. \\
+			First of all, every program is written in C++, using object oriented programming and other modern programming tecniques. Every program is successfully compiled and tested on gcc version 10.2.1 20201125 (Red Hat 10.2.1-9) (GCC) compiler, on Fedora 33 (Workstation edition) linux system: but it sould work on all OSes (i don't see a reason why it wouldn't work since none of the libraries or functions are OS specific) and most compilers (albeit with possible small changes to the code, some parts of code could be compiler specific). What's also important is that the code is written in C++11 standard, so the compiler might have to be told to use it (most compilers today have it as default.
+			My approach to the problem was to write a class containing a solution to the problem and all functions needed to manipulate solutions, which is contained in nqcommon.h and the just write different main function using that header file as a baseline and using different algorithms to solve the problem.
+		\subsection{Common code}
+			Now, as we explained, everything is nqcommon.h is shared among all algorithms and it's a baseline for all of them.
+
+\end{document}	

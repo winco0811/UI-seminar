@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Specific executables
+programs/random_neighbour_hill_climb
+programs/random_restart_hill_climb
+programs/sa
+programs/simple_hill_climb
+programs/steepest_hill_climb
+programs/stochastic_hill_climb
