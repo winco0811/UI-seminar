@@ -1,9 +1,10 @@
 /*this program uses random neighbours approach to hill climbing: 
  * we take the solution and look at all of its neighbours
- * if one of them is larger then the solution AND the rest of the neighbours we
+ * if at least one of them is larger then the solution we
  * make the new solution that neighbour
- * but if there are ties we pick a random neighbour (not just among ties)
+ * if there is no higher neighbour but there are equal ones we pick any random neighbour
  * we repeat this until all of the neighbours are smaller then the current solution
+ * if the solution isn't optimal we do a random neighbour: pick any neighbour as the next solution
  */
 #include <cstdlib>
 #include <iostream>
@@ -43,7 +44,7 @@ int main (int argc, char* argv[]) {
 				if (temp_cost==best_cost) equal=1;
         	        }
 		}
-                if (changed && !equal) { //if there is only one better option just climb it
+                if (changed) { //if there is a better option climb is
                         current_best=temp_best;
                         best_cost=temp_best_cost;
                         std::cout << step << ". (cost=" << best_cost << ")" << std::endl;
@@ -51,7 +52,7 @@ int main (int argc, char* argv[]) {
                         step++;
                 }
                 else {
-			if (equal) { //if there is more then one best take a random step
+			if (equal || best_cost!=0) { //if there are multiple same cost neigbours and our current solution take a random step (attempt to step out of shoulder or local optima). If we dont hve equal options, but cost isnt 0 we ae in local optima, not the global one!
 				current_best=current_best.random_neighbour(max_move);
 				best_cost=current_best.cost();
 				std::cout << step << ". (cost=" << best_cost << ")" << std::endl;
@@ -59,7 +60,7 @@ int main (int argc, char* argv[]) {
                         	step++;
 			}
 			else {
-                		not_finished=0; //if there are no better options we have the best one (probbably XD)
+                		not_finished=0; //if there are no better options and no equal options we are in global optima
 			}
                 }
                 if (best_cost==0) not_finished=0;

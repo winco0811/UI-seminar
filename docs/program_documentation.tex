@@ -8,12 +8,69 @@
                 \maketitle
         \end{titlepage}
 	\tableofcontents
+	\pagebreak
 	\section{General information, common code}
 		\subsection{General information}
 			Here we are going to explain the code used in this project and it's uses, we are gonna explain classes, variables, methods etc. We are not gonna analyze said code/algorithms or compare them, this is something we will be saving for User documentation. \\
 			First of all, every program is written in C++, using object oriented programming and other modern programming tecniques. Every program is successfully compiled and tested on gcc version 10.2.1 20201125 (Red Hat 10.2.1-9) (GCC) compiler, on Fedora 33 (Workstation edition) linux system: but it sould work on all OSes (i don't see a reason why it wouldn't work since none of the libraries or functions are OS specific) and most compilers (albeit with possible small changes to the code, some parts of code could be compiler specific). What's also important is that the code is written in C++11 standard, so the compiler might have to be told to use it (most compilers today have it as default.
 			My approach to the problem was to write a class containing a solution to the problem and all functions needed to manipulate solutions, which is contained in nqcommon.h and the just write different main function using that header file as a baseline and using different algorithms to solve the problem.
 		\subsection{Common code}
-			Now, as we explained, everything is nqcommon.h is shared among all algorithms and it's a baseline for all of them.
+			Everything is nqcommon.h is shared among all algorithms and it's a baseline for all of them.\\
+			Let's analyze nqcommon.h. \\
+			First we define some constants, LEFT and RIGHT: this is used to discaonnect the user programs from the implementation: the algorithm using the header only needd to think its moving the queen left or right, and not HOW to move it left or right. \\
+			Next we seed out random numbers using built in random device and using Mersenne Twister pseudorandom generator to generate numbers out of that random device. There are also 2 templates that give as uniformly distributed random number in a given range: one gives integers (\textbf{short}, \textbf{int}, \textbf{long int}...), other gives real numbers (\textbf{float}, \textbf{double}). Thiese templates were taken from \url{https://stackoverflow.com/questions/288739/generate-random-numbers-uniformly-over-an-entire-range}.\\
+			The class solution is the main part of this file: every other thing it the file is actually part of it. So, let's analyze it: \\
+			Private (you can't use thiese outside of the class):
+			\begin{itemize}
+				\item queen\_col is a vector of integers: basically a C++ take on classic C-like arrays. It's is dynamic, fast and a lot less error prone than naked arrays. It dynamically rescales it's size, each rescale taking more memory in one go, so the more we change it the less it will need to resize (something similar is used when deciding how much disk space sould database files take). Solution will be written in a way that every element of the vector represents a row, and number in it represents a column, eg. queen\_col[1]=2 means that in row 1 (2nd one, we start from 0) there is a queen in column 2 (third one)
+				\item N is an integer which holds the amount of elements in queen\_col: it can be calculated with queen\_col.size() but we will avoid calling the same function multiple times if not necessary
+			\end{itemize}
+			Public (every part of the program can use them):
+			\begin{itemize}
+				\item soution() - basic no input constructor, so we can do stuff like solution A;
+				\item solution(const solution\& original) - copy constructor, allows us to do stuff like solution A=B;
+				\item solution(int number) - custom constructor: if we give it a number is automatically consider it N and also gives us a random solution with queen\_col's constraints
+				\item operator=(std::vector<int> \&input) rewrites an association operator = so we can associate solution class with a vector, we can do stuff like this: (solution) A = (vector<int>) B;
+				\item cost() - function that returns the cost of the current solution, in how many attacks happen
+				\item randomize() - randomizes the solution among all allowed ones
+				\item random\_neighbour(int max\_step) - gives us a random neighbour of the current solution: picks one random queen and moves it between 1 and \textit{max\_step} spaces left or right
+				\item neighbour(int row, int move, int step) - gives us a specific neighbour: the one that is in row \textit{row}, taking that queen and moving it in direction move by \textit{step} steps. if we overflow or underflow (leave the board) we just wrap around.
+				\item print() prints the solution on screen
+			\end{itemize}
+			In this way the variables itself are encapsulated: no one can actually change them manually, only by calling public functions. \\
+			Also, this way everything specific about n-queens is in this header: cpps are not gonna be n-queen specific at all, it would be easy to write another header for a different problem and simply use same mains (cpps).
+	\pagebreak
+	\section{Algorithms}
+		Each algorithm cpp has some things in common:
+		\begin{itemize}
+			\item We take 2 arguments from the command line: first is N, the number of fields and the second one is the maximum allowed step distance. \\
+			\item We make the initial solution random with solution current\_best(N); and calculate its cost with int best\_cost=current\_best.cost();
+			\item In the end we print out how good is our solution (minimum cost).
+		\end{itemize}
+		All of the algorithms are different in while loop or some have custom constants.\\
+		Cpps are named after their algorithm.
+		\subsection{Simple hill climbing}
+			Here we do a while loop until we either find the solution (cost=0) or we can't find a step to climb. \\
+			In the loop we simply look at neighbours in order ($row \rightarrow ascending step amount \rightarrow LEFT,RIGHT$) and as soon as we find a step that give a better cost then our curren solution we take it.
+		\subsection{Steepest hill climbing}
+			We also do the while loop until we find either a solution or we can't find an improvement. \\
+			The difference here is that we look at all possible neighbours and pick the one that will give us the highest cost decrease. Then we take that step.
+		\subsection{Random neighbour hill climbing}
+			This is a variant of steepest hill climbing algorithm.
+			We do the while loop until we find the global optima (will happen, eventually, cause we know it exists for N>3).
+			In the loop we do basic steepest hill climb, but if we can't find a better solution and we are not in global optima we take a random neighbour and use it as next solution, hoping to escape the shouder or local optima.\\
+			We use boolean changed to track if we found a better step then current position, and equal to track if there are solutions similar to our current one.
+		\subsection{Random restart hill climbing}
+			A variant of simple hill climbing. \\
+			We basically do simple hill climbing until we find the optima, each time starting it from a random position and then comparing the result to top\_best - a variable where we save the best solution of all restarts.\
+		\subsection{Stochastic hill climbing}
+			Hill climbing based on random climbing. \\
+			We choose a random neighbour, and decide whether we want to take that step or try another. \\
+			We have 2 constants here, CHANCE and BIAS. CHANCE is a base chance for us to pick any considered step, while BIAS is how biased we are towards better steps (basically, the more the step improves our position the more we are likely to pick it, and by increasing BIAS we improve the rate of proportionality).\\
+			The formula we use is $P(x)=CHANCE*BIAS^{bc-tc}$ where bc(best\_cost) is cost of our current solution, and tc(temp\_cost) is the cost of new solution.
+		\subsection{Simulated anneling}
+			Here we have multiple constants: INITIAL\_TEMP	initial entropy we start with, TEMP\_DECAY how fast are we losing entrophy, COOLED when do we consider our solution "cooled" enough, BC Bolzmann constant. \\
+			How it works is we have a loop from INITIAL\_TEMP down to COOLED with TEMP\_DECAY step, and in each step we look at random neighbour of our current solution: if its better take the step, if it isn't take it anyways with probability $P(x)=e^{(tc-bc)/(temp*BC)}$ where tc(ran\_cost) is the cost of the step we are thinking of taking and bc(best\_cost) is the cost of our current solution. Temp is just a loop iterator.\\
+			Once our temp reaches COOLED we are done.
 
 \end{document}	

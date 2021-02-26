@@ -38,3 +38,9 @@ programs/sa
 programs/simple_hill_climb
 programs/steepest_hill_climb
 programs/stochastic_hill_climb
+
+#LaTeX helper files
+*.aux
+*.log
+*.out
+*.toc
