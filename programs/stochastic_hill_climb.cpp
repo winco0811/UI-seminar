@@ -4,8 +4,6 @@
 #include <cstdlib>
 #include <iostream>
 #include "nqcommon.h"
-#define CHANCE 0.1
-#define BIAS 2
 int main (int argc, char* argv[]) {
         if (argc<3) exit(EXIT_FAILURE);
         int max_move=std::atoi(argv[2]);
@@ -23,7 +21,7 @@ int main (int argc, char* argv[]) {
 			temp_best=current_best.random_neighbour(max_move);
 			temp_cost=temp_best.cost();
 		}
-		while(random_real<double>(0,1)>(CHANCE*pow(BIAS,best_cost-temp_cost)));
+		while(random_real<double>(0,1)>1.0/(1+exp(temp_cost-best_cost)));
                 current_best=temp_best;
                 best_cost=temp_cost;
                 std::cout << step << ". (cost=" << best_cost << ")" << std::endl;

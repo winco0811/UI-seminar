@@ -17,34 +17,29 @@ int main (int argc, char* argv[]) {
         int best_cost=current_best.cost();
         std::cout << "1. (cost=" << best_cost << ")" << std::endl;
         current_best.print();
-        bool not_finished=1,changed,equal;
+        bool not_finished=1,changed;
         int temp_cost,temp_best_cost=best_cost;
         solution temp_best(N);
         int step=2;
         while (not_finished) {
                 changed=0;
-		equal=0; //says if there are more than 1 of the best neighbours
                 for (int i=0; i<N; i++) {
 			for (int j=1; j<=max_move; j++) { //for every possible neighbour we check if its better
                         	temp_cost=current_best.neighbour(i,LEFT,j).cost();
 	                        if (temp_cost<temp_best_cost) {
         	                        temp_best=current_best.neighbour(i,LEFT,j);
                 	                temp_best_cost=temp_cost;
-					equal==0;
                         	        changed=1;
 	                        }
-				if (temp_cost==best_cost) equal=1;
                 	        temp_cost=current_best.neighbour(i,RIGHT,j).cost();
                         	if (temp_cost<temp_best_cost) {
 	                                temp_best=current_best.neighbour(i,RIGHT,j);
         	                        temp_best_cost=temp_cost;
-					equal=0;
                 	                changed=1;
                         	}
-				if (temp_cost==best_cost) equal=1;
         	        }
 		}
-                if (changed) { //if there is a better option climb is
+                if (changed) { //if there is a better option climb it
                         current_best=temp_best;
                         best_cost=temp_best_cost;
                         std::cout << step << ". (cost=" << best_cost << ")" << std::endl;
@@ -52,7 +47,7 @@ int main (int argc, char* argv[]) {
                         step++;
                 }
                 else {
-			if (equal || best_cost!=0) { //if there are multiple same cost neigbours and our current solution take a random step (attempt to step out of shoulder or local optima). If we dont hve equal options, but cost isnt 0 we ae in local optima, not the global one!
+			if (best_cost!=0) { //if there are multiple same cost neigbours and our current solution take a random step (attempt to step out of shoulder or local optima). If we dont hve equal options, but cost isnt 0 we are in local optima, not the global one!
 				current_best=current_best.random_neighbour(max_move);
 				best_cost=current_best.cost();
 				std::cout << step << ". (cost=" << best_cost << ")" << std::endl;

@@ -1,5 +1,5 @@
 \documentclass[10pt,a4paper]{article}
-\usepackage[]{hyperref}
+\PassOptionsToPackage{hyphens}{url}\usepackage[]{hyperref}
 \author{Vinko Lovrenčić \\ \footnotesize Mentor: prof. dr. sc. Luka Grubišić \\ Prirodoslovno-matematički fakultet, Matematički odsjek}
 \date{February 25th 2021.}
 \title{Program documentation for using Hill climbing algorithms to solve N-queen problem}
@@ -43,7 +43,7 @@
 	\section{Algorithms}
 		Each algorithm cpp has some things in common:
 		\begin{itemize}
-			\item We take 2 arguments from the command line: first is N, the number of fields and the second one is the maximum allowed step distance. \\
+			\item We take 2 arguments from the command line: first is N, the number of fields and the second one is the maximum allowed step distance. (eg. simple\_hill\_climb 8 4 will do simple hill climb for 8 queens with maximum allowed step of 4)\\
 			\item We make the initial solution random with solution current\_best(N); and calculate its cost with int best\_cost=current\_best.cost();
 			\item In the end we print out how good is our solution (minimum cost).
 		\end{itemize}
@@ -59,18 +59,20 @@
 			This is a variant of steepest hill climbing algorithm.
 			We do the while loop until we find the global optima (will happen, eventually, cause we know it exists for N>3).
 			In the loop we do basic steepest hill climb, but if we can't find a better solution and we are not in global optima we take a random neighbour and use it as next solution, hoping to escape the shouder or local optima.\\
-			We use boolean changed to track if we found a better step then current position, and equal to track if there are solutions similar to our current one.
+			We use boolean changed to track if we found a better step then current position.
 		\subsection{Random restart hill climbing}
 			A variant of simple hill climbing. \\
 			We basically do simple hill climbing until we find the optima, each time starting it from a random position and then comparing the result to top\_best - a variable where we save the best solution of all restarts.\
 		\subsection{Stochastic hill climbing}
 			Hill climbing based on random climbing. \\
 			We choose a random neighbour, and decide whether we want to take that step or try another. \\
-			We have 2 constants here, CHANCE and BIAS. CHANCE is a base chance for us to pick any considered step, while BIAS is how biased we are towards better steps (basically, the more the step improves our position the more we are likely to pick it, and by increasing BIAS we improve the rate of proportionality).\\
-			The formula we use is $P(x)=CHANCE*BIAS^{bc-tc}$ where bc(best\_cost) is cost of our current solution, and tc(temp\_cost) is the cost of new solution.
+			The formula we use is $P(x)=1/(1+e^{tc-bc}$ where bc(best\_cost) is cost of our current solution, and tc(temp\_cost) is the cost of new solution. This is a sigmoid activation function and it suits bias towards better solutions the best. (It is often used in neural networks, for similar reasons)
 		\subsection{Simulated anneling}
 			Here we have multiple constants: INITIAL\_TEMP	initial entropy we start with, TEMP\_DECAY how fast are we losing entrophy, COOLED when do we consider our solution "cooled" enough, BC Bolzmann constant. \\
 			How it works is we have a loop from INITIAL\_TEMP down to COOLED with TEMP\_DECAY step, and in each step we look at random neighbour of our current solution: if its better take the step, if it isn't take it anyways with probability $P(x)=e^{(tc-bc)/(temp*BC)}$ where tc(ran\_cost) is the cost of the step we are thinking of taking and bc(best\_cost) is the cost of our current solution. Temp is just a loop iterator.\\
 			Once our temp reaches COOLED we are done.
 
+		\subsection{Testing algorithms (testing\_algos)}
+			This is a testing function containing all algorithms is a trimmed form (no prints to stdout because those take a lot of time, and no comments) and time constrained (every algorithm is terminated if it's execution time exeeds the predefined constant). It takes 3 inputs from the terminal: N (number of queens), max\_step (maximum allowed step) and tries (how many different random boards are algorithms going to solve). (eg. testing\_algos 10 10 1000 will give all algorithms 1000 random boards to solve with 10 queens and 10 moves allowed in one state change). This algorithm (along with anneling constants) has it's own constant TIME\_CONSTRAINT which dictates maximum allowed time an algorithm can run (in milliseconds).\\
+			Also, stochastic, random neighbour and simulated anneling were changed to output the best solution cost they went through, instead of the current one they are working on, because they can actually worsen their current solution at any point hoping to get a better one later.
 \end{document}	

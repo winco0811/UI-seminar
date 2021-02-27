@@ -8,7 +8,7 @@
 #define INITIAL_TEMP 100 //Starting temperature for annealing
 #define TEMP_DECAY 0.001 //How much will our temperature decay after one iteration
 #define COOLED 0 //When do we consider out solution to be "cooled", to be done
-#define BC 1.380649e-23 /Bolzmann constant
+#define BC 1.380649e-23 //Bolzmann constant
 int main (int argc, char* argv[]) {
 	if (argc<3) exit(EXIT_FAILURE);
         int max_move=std::atoi(argv[2]);
